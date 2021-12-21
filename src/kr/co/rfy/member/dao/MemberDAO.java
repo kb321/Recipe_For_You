@@ -10,10 +10,10 @@ import kr.co.rfy.member.vo.Member;
 
 public class MemberDAO {
 
-	public Member memberIdCheck(Connection conn, String userId) {
+	public String memberIdCheck(Connection conn, String userId) {
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
-		Member m = null;
+		String id = "";
 		String sql = "SELECT * FROM MEMBER WHERE USER_ID=?";
 		
 		try {
@@ -24,18 +24,7 @@ public class MemberDAO {
 			rset = pstmt.executeQuery();
 			
 			if(rset.next()) {
-				m = new Member();
-				m.setUserNo(rset.getInt("user_no"));
-				m.setUserId(rset.getString("user_id"));
-				m.setUserPwd(rset.getString("user_pwd"));
-				m.setUserName(rset.getString("user_name"));
-				m.setUserEmail(rset.getString("user_email"));
-				m.setUserPhone(rset.getString("user_phone"));
-				m.setAgreeYN(rset.getString("user_id").charAt(0));
-				m.setEnrollDate(rset.getDate("enroll_date"));
-				m.setBlackYN(rset.getString("black_yn").charAt(0));
-				m.setRoll(rset.getString("roll"));
-				m.setEndYN(rset.getString("end_yn").charAt(0));
+				id = rset.getString("user_id");
 			}
 			
 		} catch (SQLException e) {
@@ -45,7 +34,7 @@ public class MemberDAO {
 			JDBCTemplate.close(rset);
 			JDBCTemplate.close(pstmt);
 		}
-		return m;
+		return id;
 	}
 
 	public int memberJoin(Connection conn, Member m) {
@@ -175,6 +164,33 @@ public class MemberDAO {
 			JDBCTemplate.close(pstmt);
 		}
 		return result;
+	}
+
+	public String memberEmailCheck(Connection conn, String userEmail) {
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		String email = "";
+		String sql = "SELECT * FROM MEMBER WHERE USER_EMAIL=?";
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, userEmail);
+			
+			rset = pstmt.executeQuery();
+			
+			if(rset.next()) {
+				email = rset.getString("user_email");
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rset);
+			JDBCTemplate.close(pstmt);
+		}
+		return email;
 	}
 
 }

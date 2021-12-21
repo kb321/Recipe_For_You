@@ -136,15 +136,19 @@
             <!--이메일-->
             <div class="th">이메일 </div>
             <div class="td">
-            <input type="email" name="userEmail" placeholder=" 예: member@join.com" data-name="이메일">
+	            <input type="email" name="userEmail" placeholder=" 예: member@join.com" data-name="이메일">
+                <button id="checkEmail">인증하기</button><br>
             </div>
 			<div class="validation" style="display:none;"><div class="th"></div><span>이메일 형식으로 작성</span></div><br>
+			<div class="validation" style="display:none;">
+				<div class="th">인증번호</div>
+				<input type="text" id="checkEmailNo" />
+			</div><br>
 
             <!--전화번호-->
             <div class="th">전화번호 </div>
             <div class="td">
                 <input type="text" name="userPhone" placeholder=" 숫자만 입력해주세요" maxlength="11" data-name="전화번호">
-                <button id="checkPhone">인증하기</button><br>
             </div>
             <div class="validation" style="display:none;"><div class="th"></div><span>숫자만 입력</span></div><br>
 
@@ -340,7 +344,7 @@
 	            	success : function(idCheck){
 	            		// idcheck값으로 1이 오면 중복된 아이디
 	            		if(idCheck==0){
-	            			$("input[name=userId]").attr("idcheck",userId) // userId 태그에 아이디 사용가능 표시로 속성을 추가
+	            			$("input[name=userId]").attr("idCheck",userId) // userId 태그에 아이디 사용가능 표시로 속성을 추가
 	            			$msg.html("사용가능한 아이디입니다.");
 	            			$modal.modal("show");
 	            		}else{
@@ -357,6 +361,40 @@
             	$modal.modal("show");
             };
         })
+        
+        $("#checkEmail").click(function(){
+        	var email = ("input[name=userEmail]").val();
+        	var exp = ".+@.+";
+        	var $msg = $("#alertModalMSG");
+        	var $modal = $("#alertModal");
+        	
+        	// 인증번호를 보내기전 email 유효성 검사
+            if(checkValidation(userId,exp)){
+	            $.ajax({
+	            	url : "/AjaxEmailCheck.do",
+	            	type : "post",
+	            	data : {"userEmail":email},
+	            	success : function(emailCheck){
+	            		// idcheck값으로 1이 오면 중복된 이메일
+	            		if(idCheck==0){
+	            			$("input[name=userEmail]").attr("emailCheck",email) // userEmail 태그에 인증번호를 보낸 이메일주소를 속성으로 추가
+	            			$msg.html("사용가능한 아이디입니다.");
+	            			$modal.modal("show");
+	            		}else{
+	            			$msg.html("이미 사용중인 이메일입니다.");
+	            			$modal.modal("show");
+	            		}	
+	            	},
+	            	error : function(){
+	            		location.replace("/views/commons/error.jsp")
+	            	}
+	            })
+            }else{
+            	$msg.html("이메일 형식이 아닙니다.");
+            	$modal.modal("show");
+            };
+        })
+        
 			// 회원가입 버튼을 클릭하여 폼태그 사항을 submit하기전 입력사항 검사
         $("#joinBtn").click(function(){
         	var $msg = $("#alertModalMSG");

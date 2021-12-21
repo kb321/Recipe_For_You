@@ -8,10 +8,10 @@ public interface MemberService {
 
 	/**
 	 * @param userId
-	 * @return Member
-	 * Description : 회원 아이디 조회
+	 * @return String
+	 * Description : 회원 아이디 조회(ajax)
 	 */
-	Member memberIdCheck(String userId);
+	String memberIdCheck(String userId);
 
 	/**
 	 * @param m 
@@ -51,5 +51,12 @@ public interface MemberService {
 	 * Description : 회원비밀번호 변경 
 	 */
 	int memberPwdChange(String userId, String userPwd);
+
+	/**
+	 * @param userEmail
+	 * @return String
+	 * Description : 이메일 조회(ajax) 
+	 */
+	String emailCheck(String userEmail);
 
 }
