@@ -32,6 +32,14 @@ public class MemberJoinServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		// 로그인한 회원인지 확인
+		if(request.getSession().getAttribute("member")!=null) {
+			response.sendRedirect("/views/commons/error.jsp");
+			return;
+		}
+		
+		// 입력받은 회원정보 가져오기
 		request.setCharacterEncoding("UTF-8");
 		String userId = request.getParameter("userId");
 		String userPwd = request.getParameter("userPwd");
@@ -40,30 +48,26 @@ public class MemberJoinServlet extends HttpServlet {
 		String userPhone = request.getParameter("userPhone");
 		char userConsent = request.getParameter("userConsent").charAt(0);
 		
-		
-		
+		// 입력받은 정보 Member 객체화 
 		Member m = new Member(userId, userPwd, userName, userEmail, userPhone, userConsent);
 		
+		// 유효성 검증
 		MemberJoinDataCheck mDataCheck = new MemberJoinDataCheck();
 		
 		RequestDispatcher view = request.getRequestDispatcher("/views/member/memberJoinResult.jsp");
-
+		
+		// 유효성 검증에 따른 비지니스로직처리
 		if(mDataCheck.regExp(m)) {
-
+			
 			MemberService mService = new MemberServiceImpl();
 			int result = mService.memberJoin(m);
 			
-			
-			if(result>0) {
-				request.setAttribute("result", true);
-			}else {
-				request.setAttribute("result", false);
-			}
+			if(result>0) request.setAttribute("result", true);
+			else request.setAttribute("result", false);
 			
 			view.forward(request, response);
 			
 		}else {
-			
 			request.setAttribute("result", false);
 			view.forward(request, response);
 			

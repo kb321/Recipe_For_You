@@ -33,17 +33,16 @@ public class AjaxIdCheckServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		// 입력받은 아이디
 		String userId = request.getParameter("userId");
 		
 		MemberService mService = new MemberServiceImpl();
 		Member m = mService.memberIdCheck(userId);
 		
+		// 결과에 따라 ajax에 보내줄 값 설정
 		int result;
-		if(m==null) {
-			result=0;
-		}else {
-			result=1;
-		}
+		if(m==null) result=0;
+		else result=1;
 		
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
