@@ -137,12 +137,15 @@
             <div class="th">이메일 </div>
             <div class="td">
 	            <input type="email" name="userEmail" placeholder=" 예: member@join.com" data-name="이메일">
-                <button id="checkEmail">인증하기</button><br>
+                <button id="checkEmail" type="button">인증하기</button><br>
             </div>
 			<div class="validation" style="display:none;"><div class="th"></div><span>이메일 형식으로 작성</span></div><br>
-			<div class="validation" style="display:none;">
+			<div style="display:none;" id="inputAuthKey">
 				<div class="th">인증번호</div>
-				<input type="text" id="checkEmailNo" />
+				<div class="td">
+					<input type="text" id="authKeyNo" placeholder="인증번호를 입력하세요" />
+					<button id="authKeyCheck" type="button">인증번호확인</button><br>
+				</div>
 			</div><br>
 
             <!--전화번호-->
@@ -159,7 +162,7 @@
                 <a type="button" id="showTOS" data-bs-toggle="modal" data-bs-target="#tosModal">약관보기 &gt; </a>
             </div><br>
                  
-            <br><br><br><br>
+            <br><br><br>
             <div class="th"></div><input type="button" value="회원가입" id="joinBtn" class="greenBtn">
         </form>
             <!-- 이용약관 Modal -->
@@ -281,6 +284,7 @@
             </div>
     </div>
     <script>
+		var authKey;
         //입력받은 값 유효성검사 호출
         $("input[name]").keyup(function() {
             var exp = "";
@@ -338,7 +342,7 @@
             	//아이디체 중복확인전 다시한번 아이디 유효성 검사
             if(checkValidation(userId,exp)){
 	            $.ajax({
-	            	url : "/AjaxIdCheck.do",
+	            	url : "/member/AjaxIdCheck.do",
 	            	type : "post",
 	            	data : {"userId":userId},
 	            	success : function(idCheck){
@@ -361,24 +365,27 @@
             	$modal.modal("show");
             };
         })
-        
+        	// 이메일 인증
         $("#checkEmail").click(function(){
-        	var email = ("input[name=userEmail]").val();
+        	var email = $("input[name=userEmail]").val();
         	var exp = ".+@.+";
         	var $msg = $("#alertModalMSG");
         	var $modal = $("#alertModal");
-        	
+
         	// 인증번호를 보내기전 email 유효성 검사
-            if(checkValidation(userId,exp)){
+            if(checkValidation(email,exp)){
 	            $.ajax({
-	            	url : "/AjaxEmailCheck.do",
+	            	url : "/member/AjaxEmailCheck.do",
 	            	type : "post",
 	            	data : {"userEmail":email},
 	            	success : function(emailCheck){
-	            		// idcheck값으로 1이 오면 중복된 이메일
-	            		if(idCheck==0){
+	            		// emailCheck 값으로 fail이 오면 중복된 이메일
+	            		var result = $.trim(emailCheck);
+	            		if(result!="fail"){
 	            			$("input[name=userEmail]").attr("emailCheck",email) // userEmail 태그에 인증번호를 보낸 이메일주소를 속성으로 추가
-	            			$msg.html("사용가능한 아이디입니다.");
+	            			$("#inputAuthKey").css("display","block");
+	            			authKey = emailCheck;
+	            			$msg.html("입력하신 이메일주소로 인증번호를 발송하였습니다.");
 	            			$modal.modal("show");
 	            		}else{
 	            			$msg.html("이미 사용중인 이메일입니다.");
@@ -393,6 +400,48 @@
             	$msg.html("이메일 형식이 아닙니다.");
             	$modal.modal("show");
             };
+        })
+        	//인증번호 확인
+        $("#authKeyCheck").click(function(){
+        	var authKeyNo = $("#authKeyNo").val();
+        	var $msg = $("#alertModalMSG");
+        	var $modal = $("#alertModal");
+        	
+        	if($("input[name=userEmail]").attr("emailCheck")==$("input[name=userEmail]").val()){
+	        	if(authKeyNo = authKey){
+	    			$msg.html("인증되었습니다.");
+	    			$modal.modal("show");
+	    			$("input[name=userEmail]").attr("emailCheck",$("input[name=userEmail]").val());
+	    			return ;
+	        	}else{
+	        		$msg.html("인증번호가 다릅니다.");
+	    			$modal.modal("show");
+	    			$("input[name=userEmail]").removeAttr("emailCheck");
+	    			return ;
+	        	}
+	        	$msg.html("이메일주소가 변경되었습니다.");
+    			$modal.modal("show");
+        	}
+        	
+            /* $.ajax({
+            	url : "/member/AjaxAuthKeyCheck.do",
+            	type : "post",
+            	data : {"authKeyNo":authKeyNo},
+            	success : function(authKeyCheck){
+            		// authKeyCheck 값으로 fail이 오면 중복된 이메일
+            		if(authKeyCheck!="fail"){
+            			$("input[name=userEmail]").attr("emailCheck",email) // userEmail 태그에 인증번호를 보낸 이메일주소를 속성으로 추가
+            			$msg.html("사용가능한 아이디입니다.");
+            			$modal.modal("show");
+            		}else{
+            			$msg.html("이미 사용중인 이메일입니다.");
+            			$modal.modal("show");
+            		}	
+            	},
+            	error : function(){
+            		location.replace("/views/commons/error.jsp")
+            	}
+	       }) */
         })
         
 			// 회원가입 버튼을 클릭하여 폼태그 사항을 submit하기전 입력사항 검사
@@ -425,6 +474,13 @@
 	            	$form = "";
 	            	return false;
     			}
+ 	       		// 이메일 인증을 하지 않았을 경우 
+ 	        	if($("input[name=userEmail]").attr("emailCheck")!=$("input[name=userEmail]").val()){
+ 	        		$msg.html("이메일 인증을 해주세요");
+ 	        		$modal.modal("show");
+	            	$form = "";
+	            	return false;
+ 	        	}
         			// 아이디 중복확인을 하지 않았을 경우 
  	        	if($userId.attr("idCheck")!=$userId.val()){
  	        		$msg.html("아이디 중복확인을 해주세요");

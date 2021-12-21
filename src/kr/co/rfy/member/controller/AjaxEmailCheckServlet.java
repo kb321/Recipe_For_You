@@ -15,7 +15,7 @@ import kr.co.rfy.member.service.MemberServiceImpl;
 /**
  * Servlet implementation class AjaxEmailCheckServlet
  */
-@WebServlet("/AjaxEmailCheck.do")
+@WebServlet("/member/AjaxEmailCheck.do")
 public class AjaxEmailCheckServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -37,17 +37,18 @@ public class AjaxEmailCheckServlet extends HttpServlet {
 		// 이메일 중복 검사
 		MemberService mService = new MemberServiceImpl();
 		String email = mService.emailCheck(userEmail);
-		
-		int result = 0;
+		System.out.println(email);
+		String result = "";
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
 		if(email.equals("")) {
-			//MemberMailCheck.emailSend(userEmail);
+			MemberMailCheck mCheck = new MemberMailCheck();
+			result = mCheck.emailSend(userEmail);
 		}else {
-			result = 1;
-			response.setCharacterEncoding("UTF-8");
-			PrintWriter out = response.getWriter();
-			
-			out.println(result);
+			result = "fail";
 		}
+		out.println(result);
 	}
 
 	/**

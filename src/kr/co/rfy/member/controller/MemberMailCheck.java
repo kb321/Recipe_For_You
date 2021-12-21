@@ -1,7 +1,9 @@
 package kr.co.rfy.member.controller;
 
 import java.util.Properties;
+import java.util.Random;
 
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -13,10 +15,10 @@ import javax.mail.internet.MimeMessage;
 
 public class MemberMailCheck {
 
-	public void emailSend(String userEmail) {
+	public String emailSend(String userEmail) {
 		
 		//인증코드 생성
-		//String AuthenticationKey = authCodeMaker();
+		String AuthenticationKey = authCodeMaker();
 		
 		// mail server 설정
 		String host = "smtp.gmail.com";
@@ -38,13 +40,16 @@ public class MemberMailCheck {
 		prop.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 		prop.put("mail.debug", "true");
         
-		//메일을 전송하기 위한 세션생성
-		Session mailSession = Session.getDefaultInstance(prop, new javax.mail.Authenticator() {
+		
+		Authenticator auth = new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(admin, password);
 			}
-		});
+		};
 		
+		// 메일을 전송하기 위한 세션생성
+		Session mailSession = Session.getDefaultInstance(prop, auth);
+
 		// 메일관련 내용 생성을 위해 MimeMessage 생성
 		MimeMessage msg = new MimeMessage(mailSession);
 		
@@ -57,15 +62,13 @@ public class MemberMailCheck {
 			// 메일 제목
 			msg.setSubject("냉장고를 부탁해 이메일 인증입니다.", "UTF-8");
 			// 메일 내용
-			//msg.setText("인증 번호 :" + AuthenticationKey );
+			msg.setText("인증 번호 :" + AuthenticationKey );
 
 			// 메일 전송	
 			Transport.send(msg);
 			// 확인
-			//System.out.println("이메일 전송 : " + AuthenticationKey);
-			//ShareVar_login sv = ShareVar_login.getInstance();
-			//sv.authEamilCode = AuthenticationKey;
-
+			System.out.println("이메일 전송 : " + AuthenticationKey);
+			
 		} catch (AddressException e) { 
 			// TODO Auto-generated catch block 
 			e.printStackTrace(); 
@@ -73,8 +76,44 @@ public class MemberMailCheck {
 				// TODO Auto-generated catch block 
 				e.printStackTrace(); 
 		}
+		return AuthenticationKey;
 	}
-		
+	
+		// 인증 번호 생성기
+		public String authCodeMaker() {
+			String authCode = null;
+			
+			// 인증번호를 담을 버퍼 생성
+			StringBuffer temp = new StringBuffer();
+			// 랜덤번호 생성을 위한 랜덤객체 생성
+			
+			Random rnd = new Random();
+			// 6자리 인증번호를 만들기 위해 for문 사용
+			for (int i = 0; i < 6; i++) {
+				// rIndex 0~2까지 숫자 생성
+				int rIndex = rnd.nextInt(3);
+				switch (rIndex) {
+				case 0:
+					// a-z 
+					temp.append((char) ((int) (rnd.nextInt(26)) + 97));
+					break;
+				case 1:
+					// A-Z
+					temp.append((char) ((int) (rnd.nextInt(26)) + 65));
+					break;
+				case 2:
+					// 0-9
+					temp.append((rnd.nextInt(10)));
+					break;
+				}
+			}
+			
+			authCode = temp.toString();
+			System.out.println(authCode);
+			
+			return authCode;
+		}
+	}
 	
 
-}
+

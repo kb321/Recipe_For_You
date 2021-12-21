@@ -16,7 +16,7 @@ import kr.co.rfy.member.vo.Member;
 /**
  * Servlet implementation class AjaxIdCheckServlet
  */
-@WebServlet("/AjaxIdCheck.do")
+@WebServlet("/member/AjaxIdCheck.do")
 public class AjaxIdCheckServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
