@@ -11,19 +11,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import kr.co.rfy.member.service.MemberService;
 import kr.co.rfy.member.service.MemberServiceImpl;
-import kr.co.rfy.member.vo.Member;
 
 /**
- * Servlet implementation class AjaxIdCheckServlet
+ * Servlet implementation class AjaxEmailCheckServlet
  */
-@WebServlet("/member/AjaxIdCheck.do")
-public class AjaxIdCheckServlet extends HttpServlet {
+@WebServlet("/member/AjaxEmailCheck.do")
+public class AjaxEmailCheckServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public AjaxIdCheckServlet() {
+    public AjaxEmailCheckServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -32,22 +31,24 @@ public class AjaxIdCheckServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 입력받은 이메일주소
+		String userEmail = request.getParameter("userEmail");
 		
-		// 입력받은 아이디
-		String userId = request.getParameter("userId");
-		
+		// 이메일 중복 검사
 		MemberService mService = new MemberServiceImpl();
-		String id = mService.memberIdCheck(userId);
-		
-		// 결과에 따라 ajax에 보내줄 값 설정
-		int result;
-		if(id.equals("")) result=0;
-		else result=1;
-		
+		String email = mService.emailCheck(userEmail);
+		System.out.println(email);
+		String result = "";
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
-		
-		out.println(result);	
+
+		if(email.equals("")) {
+			MemberMailCheck mCheck = new MemberMailCheck();
+			result = mCheck.emailSend(userEmail);
+		}else {
+			result = "fail";
+		}
+		out.println(result);
 	}
 
 	/**

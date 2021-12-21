@@ -9,10 +9,10 @@ import kr.co.rfy.member.vo.Member;
 public class MemberServiceImpl implements MemberService {
 	MemberDAO mDAO = new MemberDAO();
 	@Override
-	public Member memberIdCheck(String userId) {
+	public String memberIdCheck(String userId) {
 		Connection conn = JDBCTemplate.getConnection();
-		Member m = mDAO.memberIdCheck(conn, userId);
-		return m;
+		String id = mDAO.memberIdCheck(conn, userId);
+		return id;
 	}
 	@Override
 	public int memberJoin(Member m) {
@@ -56,6 +56,12 @@ public class MemberServiceImpl implements MemberService {
 		else JDBCTemplate.rollback(conn);
 		JDBCTemplate.close(conn);
 		return result;
+	}
+	@Override
+	public String emailCheck(String userEmail) {
+		Connection conn = JDBCTemplate.getConnection();
+		String email = mDAO.memberEmailCheck(conn, userEmail);
+		return email;
 	}
 
 }
