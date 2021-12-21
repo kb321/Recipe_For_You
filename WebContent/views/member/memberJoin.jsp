@@ -305,7 +305,7 @@
 	            	return false;
     			}
         			// 아이디 중복확인을 하지 않았을 경우 
- 	        	if($userId.attr("idCheck")!=userId.val()){
+ 	        	if($userId.attr("idCheck")!=$userId.val()){
  	        		$msg.html("아이디 중복확인을 해주세요");
  	        		$modal.modal("show");
 	            	$form = "";
