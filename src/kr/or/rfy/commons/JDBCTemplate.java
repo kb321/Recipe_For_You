@@ -1,4 +1,4 @@
-package kr.co.rfy.commons;
+package kr.or.rfy.commons;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
