@@ -61,8 +61,18 @@ public class MemberMailCheck {
 
 			// 메일 제목
 			msg.setSubject("냉장고를 부탁해 이메일 인증입니다.", "UTF-8");
-			// 메일 내용
-			msg.setText("인증 번호 :" + AuthenticationKey );
+			
+			// 메일 내용 작성
+			String mail = "<div width='600px' height='20px'></div>"
+					+ "안녕하세요 냉장고를 부탁해"
+					+ "냉장고를 부탁해 이메일 <strong>인증번호</strong>입니다. <br>"
+					+ "아래 인증번호를 입력해주세요. <br>"
+					+ "인증번호 :" +"<div font-size='1.2em'><strong>"+ AuthenticationKey + "</strong></div> <br><br>"
+					+ "마이냉장고에 나만의 식재료를 등록하시오 레시피를 추천받아보세요!! " ;
+			
+			// 메일 내용 
+			//msg.setText();
+			msg.setContent(mail, "text/html; charset=utf-8");
 
 			// 메일 전송	
 			Transport.send(msg);
